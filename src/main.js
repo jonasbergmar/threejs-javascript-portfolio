@@ -53,6 +53,11 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     renderer.setSize(containerWidth, containerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
 
+    // Enable tone mapping for better color rendering
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+
     // Style the canvas
     renderer.domElement.style.display = "block";
     renderer.domElement.style.width = "100%";
@@ -70,23 +75,30 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     // Position camera
     camera.position.z = 5;
 
-    // Add lights
-    // Ambient light - provides overall illumination
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    // Add lights - increased intensity for better visibility
+    // Ambient light - provides overall illumination (increased intensity)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
     scene.add(ambientLight);
     console.log("Ambient light added");
 
-    // Directional light - simulates sunlight
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.set(5, 5, 5);
+    // Directional light - simulates sunlight (increased intensity)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    directionalLight.position.set(5, 10, 5);
+    directionalLight.castShadow = false; // Shadows disabled for performance
     scene.add(directionalLight);
     console.log("Directional light added");
 
-    // Optional: Add a second directional light from the opposite side for better illumination
-    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
-    directionalLight2.position.set(-5, -5, -5);
+    // Second directional light from the opposite side for better illumination
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight2.position.set(-5, 5, -5);
     scene.add(directionalLight2);
     console.log("Second directional light added");
+
+    // Add a point light above for top-down illumination
+    const pointLight = new THREE.PointLight(0xffffff, 1.0);
+    pointLight.position.set(0, 10, 0);
+    scene.add(pointLight);
+    console.log("Point light added");
 
     // Optional: Add a point light for additional detail
     // const pointLight = new THREE.PointLight(0xffffff, 0.5);
@@ -112,6 +124,40 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
       "https://pub-9a148005ec23411eaa0569d3cf870b96.r2.dev/Jonas%203D%20Export_0004.glb",
       function (gltf) {
         console.log("GLTF model loaded successfully");
+        
+        // Traverse the model and ensure materials are properly configured
+        gltf.scene.traverse(function (child) {
+          if (child.isMesh) {
+            // Enable shadows if needed
+            child.castShadow = false;
+            child.receiveShadow = false;
+            
+            // Ensure materials are properly set up
+            if (child.material) {
+              // If material is an array, handle each one
+              const materials = Array.isArray(child.material) 
+                ? child.material 
+                : [child.material];
+              
+              materials.forEach((material) => {
+                // Make sure material is visible
+                material.visible = true;
+                
+                // If it's a MeshStandardMaterial or similar, ensure it's not too dark
+                if (material.isMeshStandardMaterial || material.isMeshPhysicalMaterial) {
+                  // Ensure emissive is set if needed
+                  if (material.emissive) {
+                    material.emissive.multiplyScalar(0.1); // Slight glow
+                  }
+                }
+                
+                // Force material update
+                material.needsUpdate = true;
+              });
+            }
+          }
+        });
+        
         scene.add(gltf.scene);
 
         // Adjust camera to fit model
