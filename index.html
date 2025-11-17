@@ -1,12 +1,39 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <title>Three.js Portfolio</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        overflow: hidden;
+        background: #000;
+      }
+
+      #canvas-container {
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+      }
+    </style>
   </head>
   <body>
+    <div id="canvas-container"></div>
+    <!-- For local development with Vite -->
     <script type="module" src="/src/main.js"></script>
+    <!-- For Webflow (use built file from dist folder):
+    <script src="https://raw.githubusercontent.com/jonasbergmar/threejs-javascript-portfolio/main/dist/main.js"></script>
+    -->
   </body>
 </html>
