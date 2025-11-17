@@ -185,8 +185,18 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
         console.log("GLTF model loaded successfully");
 
         // Traverse the model and ensure materials are properly configured
+        let meshCount = 0;
+        let materialCount = 0;
+
         gltf.scene.traverse(function (child) {
           if (child.isMesh) {
+            meshCount++;
+            console.log(
+              "Found mesh:",
+              child.name || "unnamed",
+              "Type:",
+              child.type
+            );
             // Enable shadows if needed
             child.castShadow = false;
             child.receiveShadow = false;
@@ -199,6 +209,14 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
                 : [child.material];
 
               materials.forEach((material) => {
+                materialCount++;
+                console.log(
+                  "Processing material:",
+                  material.type,
+                  "Material:",
+                  material
+                );
+
                 // Make sure material is visible
                 material.visible = true;
 
@@ -291,7 +309,29 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
           }
         });
 
-        console.log("Model materials processed");
+        console.log(
+          "Model materials processed - Meshes found:",
+          meshCount,
+          "Materials processed:",
+          materialCount
+        );
+
+        // Debug: Check if model is actually in the scene
+        console.log("Model scene children count:", gltf.scene.children.length);
+        console.log(
+          "Full scene children:",
+          scene.children.map((c) => c.type)
+        );
+
+        // Add a test cube to verify lighting works
+        const testGeometry = new THREE.BoxGeometry(1, 1, 1);
+        const testMaterial = new THREE.MeshStandardMaterial({
+          color: 0xff0000,
+        });
+        const testCube = new THREE.Mesh(testGeometry, testMaterial);
+        testCube.position.set(0, 0, 0);
+        scene.add(testCube);
+        console.log("Added red test cube to verify lighting");
 
         scene.add(gltf.scene);
 
