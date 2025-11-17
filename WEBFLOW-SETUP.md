@@ -29,9 +29,25 @@ This creates `dist/main.js` - a single bundled file with all dependencies (Three
 1. Go to **Page Settings** → **Custom Code** → **Footer Code** (Before `</body>` tag)
 2. Add this single script:
 
+**Option A: Using jsDelivr CDN (Recommended - Fast & Reliable)**
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/jonasbergmar/threejs-javascript-portfolio@main/dist/main.js"></script>
+```
+
+**Option B: Using GitHub Raw URL**
+
 ```html
 <script src="https://raw.githubusercontent.com/jonasbergmar/threejs-javascript-portfolio/main/dist/main.js"></script>
 ```
+
+**Why jsDelivr?**
+
+- ✅ Proper Content-Type headers (application/javascript)
+- ✅ CORS headers configured correctly
+- ✅ Fast CDN with global distribution
+- ✅ Automatic caching
+- ✅ More reliable than raw GitHub URLs
 
 **Note:** Replace `jonasbergmar` with your GitHub username if different.
 
@@ -67,7 +83,7 @@ The template includes a smart script that detects if you're running localhost an
       "http://localhost:3000/src/main.js",
     ];
     const PROD_URL = [
-      "https://raw.githubusercontent.com/jonasbergmar/threejs-javascript-portfolio/main/dist/main.js",
+      "https://cdn.jsdelivr.net/gh/jonasbergmar/threejs-javascript-portfolio@main/dist/main.js",
     ];
 
     function createScripts(arr, isDevMode) {

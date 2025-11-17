@@ -70,6 +70,33 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     // Position camera
     camera.position.z = 5;
 
+    // Add lights
+    // Ambient light - provides overall illumination
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    console.log("Ambient light added");
+
+    // Directional light - simulates sunlight
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(5, 5, 5);
+    scene.add(directionalLight);
+    console.log("Directional light added");
+
+    // Optional: Add a second directional light from the opposite side for better illumination
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+    directionalLight2.position.set(-5, -5, -5);
+    scene.add(directionalLight2);
+    console.log("Second directional light added");
+
+    // Optional: Add a point light for additional detail
+    // const pointLight = new THREE.PointLight(0xffffff, 0.5);
+    // pointLight.position.set(0, 10, 0);
+    // scene.add(pointLight);
+
+    // Optional: Add hemisphere light for natural outdoor lighting
+    // const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+    // scene.add(hemisphereLight);
+
     // Add OrbitControls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
