@@ -113,6 +113,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
+    controls.enableZoom = false;
     console.log("OrbitControls initialized");
 
     // Load GLTF model
