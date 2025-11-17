@@ -26,23 +26,16 @@ https://raw.githubusercontent.com/jonasbergmar/threejs-javascript-portfolio/main
 
 ### 3. Add to Webflow
 
-#### In Project Settings (Site-wide):
-
-1. Go to **Project Settings** → **Custom Code**
-2. In the **Head Code** section, add:
-
-```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r169/three.min.js"></script>
-```
-
 #### In Page Settings (Per Page):
 
 1. Go to **Page Settings** → **Custom Code**
-2. In the **Footer Code** section (Before `</body>` tag), add:
+2. In the **Footer Code** section (Before `</body>` tag), add this single script:
 
 ```html
-<script src="https://raw.githubusercontent.com/YOUR_USERNAME/threejs-javascript-portfolio/main/threejs-scene.js"></script>
+<script src="https://raw.githubusercontent.com/jonasbergmar/threejs-javascript-portfolio/main/threejs-scene.js"></script>
 ```
+
+**That's it!** The script automatically loads all required dependencies (Three.js, OrbitControls, GLTFLoader) - no need to add anything else.
 
 ### 4. Add Container Element
 
@@ -59,6 +52,7 @@ https://raw.githubusercontent.com/jonasbergmar/threejs-javascript-portfolio/main
 ## Troubleshooting
 
 - **Script not loading?** Check that your GitHub repository is public
-- **Three.js error?** Make sure you added the Three.js CDN in the Head Code
+- **Three.js error?** The script loads dependencies automatically - just wait a moment for them to load
+- **Import statement error?** The script uses global THREE object - no module imports needed
 - **No canvas showing?** Verify the container div has the correct ID: `canvas-container`
 - **Wrong branch?** If your default branch is `master` instead of `main`, update the URL accordingly

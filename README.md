@@ -16,38 +16,29 @@ npm install
 
 1. **Push this repository to GitHub** (if you haven't already)
 
-2. **Add Three.js Library:**
-
-   - Go to Project Settings → Custom Code
-   - Add this in the `<head>` section:
-
-   ```html
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r169/three.min.js"></script>
-   ```
-
-3. **Add Your Script from GitHub:**
+2. **Add Your Script from GitHub:**
 
    - Go to your page settings → Custom Code → Before `</body>` tag
-   - Add this script tag (replace `YOUR_USERNAME` with your GitHub username):
+   - Add this single script tag (replace `YOUR_USERNAME` with your GitHub username):
 
    ```html
    <script src="https://raw.githubusercontent.com/YOUR_USERNAME/threejs-javascript-portfolio/main/threejs-scene.js"></script>
    ```
 
    - **Note:** If your default branch is not `main`, replace it with `master` or your branch name
+   - **That's it!** The script automatically loads all required dependencies (Three.js, OrbitControls, GLTFLoader)
 
-4. **Create Container Element:**
+3. **Create Container Element:**
    - Add a div with id `canvas-container` where you want the 3D scene
    - Or modify the script to target a different element
 
 ### Option 2: Copy/Paste Script
 
-1. **Add Three.js Library** (same as Option 1, step 2)
-
-2. **Copy and Paste Script:**
+1. **Copy and Paste Script:**
    - Copy the entire contents of `threejs-scene.js`
    - Go to your page settings → Custom Code → Before `</body>` tag
    - Paste the script directly (wrapped in `<script>` tags if needed)
+   - The script will automatically load all dependencies
 
 ### Benefits of GitHub Raw URL:
 
@@ -73,6 +64,6 @@ Edit `threejs-scene.js` to customize your 3D scene. The script exposes a global 
 - `scene` - The Three.js scene
 - `camera` - The camera
 - `renderer` - The WebGL renderer
-- `cube` - The example cube mesh
+- `controls` - The OrbitControls (if available)
 
 You can access these from other scripts or Webflow interactions.
