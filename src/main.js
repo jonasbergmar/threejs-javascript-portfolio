@@ -55,7 +55,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
     // Enable tone mapping for better color rendering
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.5; // Increased exposure to brighten the scene
+    renderer.toneMappingExposure = 2.5; // Very high exposure to brighten the scene
     renderer.outputEncoding = THREE.sRGBEncoding;
 
     // Style the canvas
@@ -75,36 +75,53 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     // Position camera
     camera.position.z = 5;
 
-    // Add lights - very bright setup to ensure model is visible
+    // Add lights - EXTREMELY bright setup to ensure model is visible
     // Ambient light - provides overall illumination (very bright)
-    const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 3.0);
     scene.add(ambientLight);
-    console.log("Ambient light added");
+    console.log("Ambient light added (intensity: 3.0)");
 
     // Hemisphere light - natural sky/ground lighting (very effective)
-    const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.5);
+    const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x888888, 2.5);
     hemisphereLight.position.set(0, 10, 0);
     scene.add(hemisphereLight);
-    console.log("Hemisphere light added");
+    console.log("Hemisphere light added (intensity: 2.5)");
 
     // Directional light - simulates sunlight (very bright)
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 2.0);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 3.0);
     directionalLight.position.set(5, 10, 5);
     directionalLight.castShadow = false;
     scene.add(directionalLight);
-    console.log("Directional light added");
+    console.log("Directional light added (intensity: 3.0)");
 
     // Second directional light from the opposite side
-    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1.5);
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 2.5);
     directionalLight2.position.set(-5, 5, -5);
     scene.add(directionalLight2);
-    console.log("Second directional light added");
+    console.log("Second directional light added (intensity: 2.5)");
+
+    // Third directional light from the side
+    const directionalLight3 = new THREE.DirectionalLight(0xffffff, 2.0);
+    directionalLight3.position.set(0, 5, 10);
+    scene.add(directionalLight3);
+    console.log("Third directional light added (intensity: 2.0)");
 
     // Point light above for top-down illumination
-    const pointLight = new THREE.PointLight(0xffffff, 1.5);
+    const pointLight = new THREE.PointLight(0xffffff, 2.0);
     pointLight.position.set(0, 10, 0);
     scene.add(pointLight);
-    console.log("Point light added");
+    console.log("Point light added (intensity: 2.0)");
+
+    // Additional point lights around the model
+    const pointLight2 = new THREE.PointLight(0xffffff, 1.5);
+    pointLight2.position.set(10, 5, 0);
+    scene.add(pointLight2);
+
+    const pointLight3 = new THREE.PointLight(0xffffff, 1.5);
+    pointLight3.position.set(-10, 5, 0);
+    scene.add(pointLight3);
+
+    console.log("All lights added - total intensity very high");
 
     // Optional: Add a point light for additional detail
     // const pointLight = new THREE.PointLight(0xffffff, 0.5);
@@ -121,6 +138,8 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     controls.dampingFactor = 0.05;
     controls.enableZoom = false; // Disable zoom completely
     controls.enablePan = true; // Allow panning
+    controls.minDistance = 0; // Prevent zoom limits
+    controls.maxDistance = Infinity; // Prevent zoom limits
     controls.mouseButtons = {
       LEFT: THREE.MOUSE.ROTATE,
       MIDDLE: THREE.MOUSE.DOLLY,
@@ -131,14 +150,27 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
       TWO: THREE.TOUCH.DOLLY_PAN,
     };
 
-    // Explicitly prevent wheel zoom
-    renderer.domElement.addEventListener(
-      "wheel",
-      function (e) {
-        e.preventDefault();
-      },
-      { passive: false }
-    );
+    // Completely prevent wheel zoom - multiple methods
+    function preventZoom(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    renderer.domElement.addEventListener("wheel", preventZoom, {
+      passive: false,
+    });
+    renderer.domElement.addEventListener("DOMMouseScroll", preventZoom, {
+      passive: false,
+    });
+    renderer.domElement.addEventListener("mousewheel", preventZoom, {
+      passive: false,
+    });
+
+    // Also prevent zoom on the container
+    if (container) {
+      container.addEventListener("wheel", preventZoom, { passive: false });
+    }
 
     console.log("OrbitControls initialized - zoom disabled");
 
@@ -170,44 +202,96 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
                 // Make sure material is visible
                 material.visible = true;
 
-                // Handle different material types
+                // Handle ALL material types - be more aggressive
                 if (
                   material.isMeshStandardMaterial ||
                   material.isMeshPhysicalMaterial ||
                   material.isMeshLambertMaterial ||
-                  material.isMeshPhongMaterial
+                  material.isMeshPhongMaterial ||
+                  material.isMeshBasicMaterial ||
+                  material.isMeshToonMaterial
                 ) {
-                  // Increase material brightness
+                  // FORCE material to be visible by brightening color significantly
                   if (material.color) {
-                    // Make colors brighter if they're too dark
                     const brightness =
                       material.color.r + material.color.g + material.color.b;
-                    if (brightness < 0.3) {
-                      material.color.multiplyScalar(2.0); // Brighten dark materials
+                    console.log(
+                      "Material brightness:",
+                      brightness,
+                      "Color:",
+                      material.color
+                    );
+
+                    // If material is very dark, make it much brighter
+                    if (brightness < 0.5) {
+                      material.color.multiplyScalar(5.0); // Very aggressive brightening
+                      console.log("Brightened material color");
+                    }
+
+                    // Ensure minimum brightness
+                    if (material.color.r < 0.1) material.color.r = 0.1;
+                    if (material.color.g < 0.1) material.color.g = 0.1;
+                    if (material.color.b < 0.1) material.color.b = 0.1;
+                  }
+
+                  // For Standard/Physical materials, adjust properties
+                  if (
+                    material.isMeshStandardMaterial ||
+                    material.isMeshPhysicalMaterial
+                  ) {
+                    // Reduce metalness to make it more reflective of light
+                    if (material.metalness !== undefined) {
+                      material.metalness = Math.min(material.metalness, 0.5);
+                    }
+                    // Increase roughness to catch more light
+                    if (material.roughness !== undefined) {
+                      material.roughness = Math.max(material.roughness, 0.3);
                     }
                   }
 
-                  // Set minimum brightness
-                  if (material.emissive) {
-                    material.emissive.setHex(0x000000);
-                    material.emissiveIntensity = 0.0;
+                  // If it's a BasicMaterial, it doesn't respond to lights - convert it
+                  if (material.isMeshBasicMaterial) {
+                    console.log(
+                      "Converting BasicMaterial to StandardMaterial for lighting"
+                    );
+                    const newMaterial = new THREE.MeshStandardMaterial({
+                      color: material.color,
+                      map: material.map,
+                      transparent: material.transparent,
+                      opacity: material.opacity,
+                    });
+                    child.material = newMaterial;
                   }
-
-                  // Ensure metalness and roughness are reasonable
-                  if (material.metalness !== undefined) {
-                    material.metalness = Math.min(material.metalness, 0.8);
-                  }
-                  if (material.roughness !== undefined) {
-                    material.roughness = Math.max(material.roughness, 0.1);
-                  }
+                } else {
+                  // For unknown material types, try to create a visible material
+                  console.log(
+                    "Unknown material type, creating replacement:",
+                    material.type
+                  );
+                  const newMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xffffff,
+                    metalness: 0.3,
+                    roughness: 0.7,
+                  });
+                  child.material = newMaterial;
                 }
 
                 // Force material update
                 material.needsUpdate = true;
               });
+            } else {
+              // If no material, add one
+              console.log("Mesh has no material, adding default material");
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                metalness: 0.3,
+                roughness: 0.7,
+              });
             }
           }
         });
+
+        console.log("Model materials processed");
 
         scene.add(gltf.scene);
 
