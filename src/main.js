@@ -55,7 +55,7 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
     // Enable tone mapping for better color rendering
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.0;
+    renderer.toneMappingExposure = 1.5; // Increased exposure to brighten the scene
     renderer.outputEncoding = THREE.sRGBEncoding;
 
     // Style the canvas
@@ -75,27 +75,33 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     // Position camera
     camera.position.z = 5;
 
-    // Add lights - increased intensity for better visibility
-    // Ambient light - provides overall illumination (increased intensity)
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1.0);
+    // Add lights - very bright setup to ensure model is visible
+    // Ambient light - provides overall illumination (very bright)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
     scene.add(ambientLight);
     console.log("Ambient light added");
 
-    // Directional light - simulates sunlight (increased intensity)
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+    // Hemisphere light - natural sky/ground lighting (very effective)
+    const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.5);
+    hemisphereLight.position.set(0, 10, 0);
+    scene.add(hemisphereLight);
+    console.log("Hemisphere light added");
+
+    // Directional light - simulates sunlight (very bright)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 2.0);
     directionalLight.position.set(5, 10, 5);
-    directionalLight.castShadow = false; // Shadows disabled for performance
+    directionalLight.castShadow = false;
     scene.add(directionalLight);
     console.log("Directional light added");
 
-    // Second directional light from the opposite side for better illumination
-    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.8);
+    // Second directional light from the opposite side
+    const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1.5);
     directionalLight2.position.set(-5, 5, -5);
     scene.add(directionalLight2);
     console.log("Second directional light added");
 
-    // Add a point light above for top-down illumination
-    const pointLight = new THREE.PointLight(0xffffff, 1.0);
+    // Point light above for top-down illumination
+    const pointLight = new THREE.PointLight(0xffffff, 1.5);
     pointLight.position.set(0, 10, 0);
     scene.add(pointLight);
     console.log("Point light added");
@@ -113,8 +119,28 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.enableZoom = false;
-    console.log("OrbitControls initialized");
+    controls.enableZoom = false; // Disable zoom completely
+    controls.enablePan = true; // Allow panning
+    controls.mouseButtons = {
+      LEFT: THREE.MOUSE.ROTATE,
+      MIDDLE: THREE.MOUSE.DOLLY,
+      RIGHT: THREE.MOUSE.PAN,
+    };
+    controls.touches = {
+      ONE: THREE.TOUCH.ROTATE,
+      TWO: THREE.TOUCH.DOLLY_PAN,
+    };
+
+    // Explicitly prevent wheel zoom
+    renderer.domElement.addEventListener(
+      "wheel",
+      function (e) {
+        e.preventDefault();
+      },
+      { passive: false }
+    );
+
+    console.log("OrbitControls initialized - zoom disabled");
 
     // Load GLTF model
     const loader = new GLTFLoader();
@@ -144,14 +170,35 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
                 // Make sure material is visible
                 material.visible = true;
 
-                // If it's a MeshStandardMaterial or similar, ensure it's not too dark
+                // Handle different material types
                 if (
                   material.isMeshStandardMaterial ||
-                  material.isMeshPhysicalMaterial
+                  material.isMeshPhysicalMaterial ||
+                  material.isMeshLambertMaterial ||
+                  material.isMeshPhongMaterial
                 ) {
-                  // Ensure emissive is set if needed
+                  // Increase material brightness
+                  if (material.color) {
+                    // Make colors brighter if they're too dark
+                    const brightness =
+                      material.color.r + material.color.g + material.color.b;
+                    if (brightness < 0.3) {
+                      material.color.multiplyScalar(2.0); // Brighten dark materials
+                    }
+                  }
+
+                  // Set minimum brightness
                   if (material.emissive) {
-                    material.emissive.multiplyScalar(0.1); // Slight glow
+                    material.emissive.setHex(0x000000);
+                    material.emissiveIntensity = 0.0;
+                  }
+
+                  // Ensure metalness and roughness are reasonable
+                  if (material.metalness !== undefined) {
+                    material.metalness = Math.min(material.metalness, 0.8);
+                  }
+                  if (material.roughness !== undefined) {
+                    material.roughness = Math.max(material.roughness, 0.1);
                   }
                 }
 
