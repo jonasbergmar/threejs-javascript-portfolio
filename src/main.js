@@ -124,40 +124,43 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
       "https://pub-9a148005ec23411eaa0569d3cf870b96.r2.dev/Jonas%203D%20Export_0004.glb",
       function (gltf) {
         console.log("GLTF model loaded successfully");
-        
+
         // Traverse the model and ensure materials are properly configured
         gltf.scene.traverse(function (child) {
           if (child.isMesh) {
             // Enable shadows if needed
             child.castShadow = false;
             child.receiveShadow = false;
-            
+
             // Ensure materials are properly set up
             if (child.material) {
               // If material is an array, handle each one
-              const materials = Array.isArray(child.material) 
-                ? child.material 
+              const materials = Array.isArray(child.material)
+                ? child.material
                 : [child.material];
-              
+
               materials.forEach((material) => {
                 // Make sure material is visible
                 material.visible = true;
-                
+
                 // If it's a MeshStandardMaterial or similar, ensure it's not too dark
-                if (material.isMeshStandardMaterial || material.isMeshPhysicalMaterial) {
+                if (
+                  material.isMeshStandardMaterial ||
+                  material.isMeshPhysicalMaterial
+                ) {
                   // Ensure emissive is set if needed
                   if (material.emissive) {
                     material.emissive.multiplyScalar(0.1); // Slight glow
                   }
                 }
-                
+
                 // Force material update
                 material.needsUpdate = true;
               });
             }
           }
         });
-        
+
         scene.add(gltf.scene);
 
         // Adjust camera to fit model
