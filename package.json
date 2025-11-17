@@ -1,0 +1,21 @@
+{
+  "name": "threejs-javascript-portfolio",
+  "version": "1.0.0",
+  "description": "Three.js portfolio template for Webflow",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Build complete'"
+  },
+  "keywords": [
+    "threejs",
+    "webflow",
+    "portfolio"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.169.0"
+  },
+  "devDependencies": {}
+}

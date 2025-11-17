@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Three.js Portfolio Template</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, sans-serif;
+        overflow: hidden;
+        background: #000;
+      }
+
+      #canvas-container {
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+      }
+
+      .content {
+        position: relative;
+        z-index: 1;
+        color: white;
+        padding: 2rem;
+        pointer-events: none;
+      }
+
+      h1 {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="canvas-container"></div>
+    <div class="content">
+      <h1>Three.js Portfolio</h1>
+      <p>Your content here</p>
+    </div>
+
+    <!-- Three.js from CDN for Webflow compatibility -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r169/three.min.js"></script>
+    <!-- Your custom script -->
+    <script src="threejs-scene.js"></script>
+  </body>
+</html>
