@@ -183,19 +183,46 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
       "https://pub-9a148005ec23411eaa0569d3cf870b96.r2.dev/Jonas%203D%20Export_0004.glb",
       function (gltf) {
         console.log("GLTF model loaded successfully");
+        console.log("GLTF scene type:", gltf.scene.type);
+        console.log("GLTF scene children:", gltf.scene.children.length);
 
         // Traverse the model and ensure materials are properly configured
         let meshCount = 0;
         let materialCount = 0;
+        let totalChildren = 0;
+
+        // FIRST: Try to access meshes directly
+        console.log("*** DIRECT ACCESS TEST ***");
+        console.log("gltf.scene:", gltf.scene);
+        console.log("gltf.scene.children:", gltf.scene.children);
+
+        // Try to find meshes in children directly
+        gltf.scene.children.forEach((child, index) => {
+          console.log(`Child ${index}:`, child.type, child.name || "unnamed");
+          if (child.isMesh) {
+            console.log(`*** DIRECT MESH FOUND at index ${index} ***`);
+          }
+        });
 
         gltf.scene.traverse(function (child) {
+          totalChildren++;
+          console.log(
+            "*** TRAVERSING *** child:",
+            child.type,
+            child.name || "unnamed",
+            "isMesh:",
+            child.isMesh
+          );
+
           if (child.isMesh) {
             meshCount++;
             console.log(
-              "Found mesh:",
+              "*** FOUND MESH ***",
               child.name || "unnamed",
               "Type:",
-              child.type
+              child.type,
+              "Visible:",
+              child.visible
             );
             // Enable shadows if needed
             child.castShadow = false;
@@ -220,6 +247,34 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
                 // Make sure material is visible
                 material.visible = true;
 
+                // FORCE all materials to be bright and visible - regardless of type
+                console.log("*** PROCESSING MATERIAL *** Type:", material.type);
+
+                // ALWAYS brighten the color, no matter what
+                if (material.color) {
+                  const originalBrightness =
+                    material.color.r + material.color.g + material.color.b;
+                  console.log(
+                    "Original material brightness:",
+                    originalBrightness
+                  );
+
+                  // FORCE bright color - multiply by large amount
+                  material.color.multiplyScalar(10.0); // Very aggressive
+
+                  // Clamp to ensure it's visible
+                  material.color.r = Math.max(material.color.r, 0.5);
+                  material.color.g = Math.max(material.color.g, 0.5);
+                  material.color.b = Math.max(material.color.b, 0.5);
+
+                  console.log(
+                    "New material brightness:",
+                    material.color.r + material.color.g + material.color.b
+                  );
+                } else {
+                  console.log("Material has no color property!");
+                }
+
                 // Handle ALL material types - be more aggressive
                 if (
                   material.isMeshStandardMaterial ||
@@ -229,29 +284,6 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
                   material.isMeshBasicMaterial ||
                   material.isMeshToonMaterial
                 ) {
-                  // FORCE material to be visible by brightening color significantly
-                  if (material.color) {
-                    const brightness =
-                      material.color.r + material.color.g + material.color.b;
-                    console.log(
-                      "Material brightness:",
-                      brightness,
-                      "Color:",
-                      material.color
-                    );
-
-                    // If material is very dark, make it much brighter
-                    if (brightness < 0.5) {
-                      material.color.multiplyScalar(5.0); // Very aggressive brightening
-                      console.log("Brightened material color");
-                    }
-
-                    // Ensure minimum brightness
-                    if (material.color.r < 0.1) material.color.r = 0.1;
-                    if (material.color.g < 0.1) material.color.g = 0.1;
-                    if (material.color.b < 0.1) material.color.b = 0.1;
-                  }
-
                   // For Standard/Physical materials, adjust properties
                   if (
                     material.isMeshStandardMaterial ||
@@ -270,20 +302,21 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
                   // If it's a BasicMaterial, it doesn't respond to lights - convert it
                   if (material.isMeshBasicMaterial) {
                     console.log(
-                      "Converting BasicMaterial to StandardMaterial for lighting"
+                      "*** Converting BasicMaterial to StandardMaterial ***"
                     );
                     const newMaterial = new THREE.MeshStandardMaterial({
-                      color: material.color,
+                      color: material.color || 0xffffff,
                       map: material.map,
                       transparent: material.transparent,
                       opacity: material.opacity,
                     });
                     child.material = newMaterial;
+                    material = newMaterial; // Update reference
                   }
                 } else {
-                  // For unknown material types, try to create a visible material
+                  // For unknown material types, ALWAYS replace with visible material
                   console.log(
-                    "Unknown material type, creating replacement:",
+                    "*** UNKNOWN MATERIAL TYPE - REPLACING ***",
                     material.type
                   );
                   const newMaterial = new THREE.MeshStandardMaterial({
@@ -292,6 +325,22 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
                     roughness: 0.7,
                   });
                   child.material = newMaterial;
+                  material = newMaterial; // Update reference
+                }
+
+                // FINAL CHECK - ALWAYS force material to bright white
+                if (material.color) {
+                  material.color.setRGB(1, 1, 1); // Force white
+                  console.log("*** FORCED material to white ***");
+                } else {
+                  // If no color property, replace entire material
+                  console.log("*** NO COLOR PROPERTY - REPLACING MATERIAL ***");
+                  const whiteMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xffffff,
+                    metalness: 0.3,
+                    roughness: 0.7,
+                  });
+                  child.material = whiteMaterial;
                 }
 
                 // Force material update
@@ -310,7 +359,9 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
         });
 
         console.log(
-          "Model materials processed - Meshes found:",
+          "*** TRAVERSE COMPLETE *** - Total children:",
+          totalChildren,
+          "Meshes found:",
           meshCount,
           "Materials processed:",
           materialCount
@@ -331,9 +382,10 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
         const testCube = new THREE.Mesh(testGeometry, testMaterial);
         testCube.position.set(0, 0, 0);
         scene.add(testCube);
-        console.log("Added red test cube to verify lighting");
+        console.log("*** Added red test cube to verify lighting ***");
 
         scene.add(gltf.scene);
+        console.log("*** GLTF scene added to main scene ***");
 
         // Adjust camera to fit model
         const box = new THREE.Box3().setFromObject(gltf.scene);
