@@ -1,6 +1,9 @@
 node_modules/
 .DS_Store
 *.log
-dist/
 build/
+
+# Allow dist/main.js to be committed (needed for Webflow)
+!dist/main.js
+!dist/assets/
 
