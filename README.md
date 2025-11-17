@@ -12,7 +12,11 @@ npm install
 
 ## Usage in Webflow
 
-1. **Add Three.js Library:**
+### Option 1: Using GitHub Raw URL (Recommended - Live Updates)
+
+1. **Push this repository to GitHub** (if you haven't already)
+
+2. **Add Three.js Library:**
 
    - Go to Project Settings → Custom Code
    - Add this in the `<head>` section:
@@ -21,15 +25,36 @@ npm install
    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r169/three.min.js"></script>
    ```
 
-2. **Add Your Script:**
+3. **Add Your Script from GitHub:**
 
-   - Copy the contents of `threejs-scene.js`
    - Go to your page settings → Custom Code → Before `</body>` tag
-   - Paste the script or link to it
+   - Add this script tag (replace `YOUR_USERNAME` with your GitHub username):
 
-3. **Create Container Element:**
+   ```html
+   <script src="https://raw.githubusercontent.com/YOUR_USERNAME/threejs-javascript-portfolio/main/threejs-scene.js"></script>
+   ```
+
+   - **Note:** If your default branch is not `main`, replace it with `master` or your branch name
+
+4. **Create Container Element:**
    - Add a div with id `canvas-container` where you want the 3D scene
    - Or modify the script to target a different element
+
+### Option 2: Copy/Paste Script
+
+1. **Add Three.js Library** (same as Option 1, step 2)
+
+2. **Copy and Paste Script:**
+   - Copy the entire contents of `threejs-scene.js`
+   - Go to your page settings → Custom Code → Before `</body>` tag
+   - Paste the script directly (wrapped in `<script>` tags if needed)
+
+### Benefits of GitHub Raw URL:
+
+- ✅ Live updates: Changes pushed to GitHub automatically reflect in Webflow
+- ✅ No need to copy/paste code manually
+- ✅ Version control: Easy to track changes
+- ✅ Single source of truth
 
 ## Local Development
 
