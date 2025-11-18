@@ -31,8 +31,23 @@
 5. **Scroll to "Footer Code"** section (the one that says "Paste code before `</body>` tag")
 6. **Paste this code:**
 
+**Option A: jsDelivr CDN (Recommended - No CORS issues)**
+
 ```html
 <script src="https://cdn.jsdelivr.net/gh/jonasbergmar/threejs-javascript-portfolio@main/dist/main.js"></script>
+```
+
+**Option B: Force refresh jsDelivr cache (if updates not showing)**
+
+```html
+<!-- Add ?v= with timestamp or version number to bust cache -->
+<script src="https://cdn.jsdelivr.net/gh/jonasbergmar/threejs-javascript-portfolio@main/dist/main.js?v=3"></script>
+```
+
+**Option C: Use unpkg (alternative CDN)**
+
+```html
+<script src="https://unpkg.com/github:jonasbergmar/threejs-javascript-portfolio@main/dist/main.js"></script>
 ```
 
 7. **Click "Save"** and **close the settings**
