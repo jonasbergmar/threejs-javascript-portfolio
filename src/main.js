@@ -183,12 +183,18 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
       "https://pub-9a148005ec23411eaa0569d3cf870b96.r2.dev/Jonas%203D%20Export_0004.glb",
       function (gltf) {
         console.log("GLTF model loaded successfully");
+
+        // CRITICAL: Alert to verify new code is running
+        alert("NEW CODE LOADED - Check console for material processing logs!");
+
         console.log("*** STARTING MATERIAL PROCESSING ***");
         console.log("GLTF scene type:", gltf.scene.type);
         console.log("GLTF scene children:", gltf.scene.children.length);
-        
+
         // CRITICAL: Force immediate log to verify code is running
-        console.error("*** THIS IS NEW CODE - IF YOU SEE THIS, CODE IS RUNNING ***");
+        console.error(
+          "*** THIS IS NEW CODE - IF YOU SEE THIS, CODE IS RUNNING ***"
+        );
 
         // Traverse the model and ensure materials are properly configured
         let meshCount = 0;
